@@ -135,7 +135,80 @@
             </section>
 
             <!-- Weekly Forecast -->
-            <section class="weekly-forecast"></section>
+            <section class="weekly-forecast">
+                <div class="forecast-card glass-panel">
+                    <h2 class="section-title">Weekly Forecast</h2>
+
+                    <div class="carousel-container">
+                        <button class="carousel-nav prev" aria-label="Previous days">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <div class="carousel-track">
+                            
+                            <div class="day-card">
+                                <span class="day-name">Mon</span>
+                                <img src="img/favicon.ico" alt="Rain" class="day-icon">
+                                <span class="day-temp">10°</span>
+                            </div>
+
+                            <div class="day-card">
+                                <span class="day-name">Tue</span>
+                                <img src="img/favicon.ico" alt="Sun and clouds" class="day-icon">
+                                <span class="day-temp">12°</span>
+                            </div>
+
+                            <div class="day-card">
+                                <span class="day-name">Wed</span>
+                                <img src="img/favicon.ico" alt="Sun and clouds" class="day-icon">
+                                <span class="day-temp">15°</span>
+                            </div>
+
+                            <div class="day-card">
+                                <span class="day-name">Thu</span>
+                                <img src="img/favicon.ico" alt="Rain" class="day-icon">
+                                <span class="day-temp">13°</span>
+                            </div>
+
+                            <div class="day-card">
+                                <span class="day-name">Fri</span>
+                                <img src="img/favicon.ico" alt="Cloudy" class="day-icon">
+                                <span class="day-temp">13°</span>
+                            </div>
+
+                            <div class="day-card">
+                                <span class="day-name">Sat</span>
+                                <img src="img/favicon.ico" alt="Sun and clouds" class="day-icon">
+                                <span class="day-temp">16°</span>
+                            </div>
+
+                            <div class="day-card">
+                                <span class="day-name">Sun</span>
+                                <img src="img/favicon.ico" alt="Sun and clouds" class="day-icon">
+                                <span class="day-temp">19°</span>
+                            </div>
+
+                        </div>
+
+                        <button class="carousel-nav next">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="forecast-footer">
+                        <span class="avg-temp">Weekly Average Temp: 14°C</span>
+                        
+                        <div class="rain-filter">
+                            <label class="toggle-switch" for="hideRainToggle">
+                                <input type="checkbox" id="hideRainToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="filter-label">hide rain</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
 
             <!-- Favourite Locations  -->
             <aside class="favourite-locations"></aside>
