@@ -26,7 +26,7 @@
     <header class="header">
         <!-- Navbar -->
         <nav class="navbar">
-            
+
             <div class="navbar-logo">
                 <i class="fa-solid fa-cloud-sun"></i> 
                 <span>WeatherApp</span>
@@ -37,9 +37,11 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" placeholder="Search">
                 </div>
+
                 <button class="btn">
                     <i class="fa-solid fa-location-dot"></i> My Location
                 </button>
+
                 <button class="btn">
                     <i class="fa-solid fa-shuffle"></i> RANDOM
                 </button>
@@ -65,7 +67,72 @@
     <main class="container">
         <div class="layout-grid">
             <!-- Weather Dashboard -->
-            <section class="weather-dashboard"></section>
+            <section class="weather-dashboard">
+
+                <div class="mobile-actions mobile-only">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search">
+                    </div>
+
+                    <div class="mobile-btns">
+                        <button class="btn">
+                            <i class="fa-solid fa-location-dot"></i> My Location
+                        </button>
+                        <button class="btn">
+                            <i class="fa-solid fa-shuffle"></i> RANDOM
+                        </button>
+                    </div>
+                </div>
+
+                <div class="weather-card glass-panel">
+                    <h1 class="location">Warsaw, Poland</h1>
+                    <div class="current-weather">
+                        <img src="img/logo.png" style="width:100px;height:100px;" alt="Sunny with rain" class="weather-icon">
+                        <span class="temperature">29°</span>
+                        <p class="condition">Partly Sunny<br>With Heavy Rain</p>
+                    </div>
+
+                    <button class="details-toggle mobile-only">
+                        Show details... <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <div class="details-grid">
+
+                        <div class="detail-box">
+                            <i class="fa-regular fa-sun"></i>
+                            <span class="detail-label">UV Index</span>
+                            <span class="detail-value">High</span>
+                        </div>
+
+                        <div class="detail-box">
+                            <i class="fa-solid fa-droplet"></i>
+                            <span class="detail-label">Humidity</span>
+                            <span class="detail-value">55%</span>
+                        </div>
+
+                        <div class="detail-box">
+                            <i class="fa-solid fa-wind"></i>
+                            <span class="detail-label">Wind</span>
+                            <span class="detail-value">4 km/h</span>
+                        </div>
+
+                        <div class="detail-box">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="detail-label">Visibility</span>
+                            <span class="detail-value">9.66 km</span>
+                        </div>
+
+                        <div class="detail-box desktop-only">
+                            <i class="fa-solid fa-smog"></i> <span class="detail-label">AQI</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
 
             <!-- Weekly Forecast -->
             <section class="weekly-forecast"></section>
