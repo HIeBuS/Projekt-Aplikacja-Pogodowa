@@ -20,11 +20,45 @@
 
     <script src="js/script.js" defer></script>
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
         <!-- Navbar -->
-        <nav class="navbar"></nav>
+        <nav class="navbar">
+            
+            <div class="navbar-logo">
+                <i class="fa-solid fa-cloud-sun"></i> 
+                <span>WeatherApp</span>
+            </div>
+
+            <div class="navbar-actions desktop-only">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+                <button class="btn">
+                    <i class="fa-solid fa-location-dot"></i> My Location
+                </button>
+                <button class="btn">
+                    <i class="fa-solid fa-shuffle"></i> RANDOM
+                </button>
+            </div>
+
+            <div class="navbar-info desktop-only">
+                <span class="date">THURSDAY, 4 DEC 2025</span>
+                <div class="divider"></div> 
+                <div class="unit-toggle">
+                    <button class="unit-btn is-active">°C</button> 
+                    <button class="unit-btn">°F</button>
+                </div>
+            </div>
+
+            <button class="hamburger mobile-only">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+        </nav>
     </header>
 
     <!-- Main Container Start-->
