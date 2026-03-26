@@ -67,7 +67,7 @@
     <main class="container">
         <div class="layout-grid">
             <!-- Weather Dashboard -->
-            <section class="weather-dashboard">
+            <section id="weather-dashboard" class="weather-dashboard">
 
                 <div class="mobile-actions mobile-only">
                     <div class="search-bar">
@@ -135,7 +135,7 @@
             </section>
 
             <!-- Weekly Forecast -->
-            <section class="weekly-forecast">
+            <section id="weekly-forecast" class="weekly-forecast">
                 <div class="forecast-card glass-panel">
                     <h2 class="section-title">Weekly Forecast</h2>
 
@@ -211,7 +211,7 @@
             </section>
 
             <!-- Favourite Locations  -->
-            <aside class="favourite-locations">
+            <aside id="favourite-locations" class="favourite-locations">
                 <div class="favourites-card glass-panel">
                     <h2 class="section-title">Favorite Locations</h2>
 
@@ -271,6 +271,30 @@
     </footer>
 
     <!-- Mobile Fullscreen Menu Overlay -->
-    <div class="mobile-menu-overlay"></div>
+    <div class="mobile-menu-overlay glass-panel" id="mobileMenu">
+    
+    <div class="overlay-content">
+        
+        <div class="overlay-header">
+            <span class="overlay-date">THURSDAY, 4 DEC 2025</span>
+            <div class="unit-toggle overlay-toggle">
+                <button class="unit-btn is-active">°C</button>
+                <button class="unit-btn">°F</button>
+            </div>
+        </div>
+
+        <nav class="overlay-nav">
+            <a href="#weather-dashboard" class="overlay-link">Dashboard</a>
+            <a href="#weekly-forecast" class="overlay-link">Weekly forecast</a>
+            <a href="#favourite-locations" class="overlay-link">Favourites</a>
+        </nav>
+
+        <div class="overlay-footer">
+            <i class="fa-solid fa-cloud-sun"></i>
+            <span>WeatherApp</span>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
