@@ -72,6 +72,18 @@ body {
     gap: 15px;
 }
 
+.weather-dashboard { grid-area: dashboard; }
+.weekly-forecast { grid-area: forecast; }
+
+.favourite-locations { 
+    grid-area: favourites; 
+    display: flex;
+}
+
+.favourite-locations .glass-panel {
+    flex: 1;
+}
+
 .glass-panel {
     background: var(--bg-primary);
     border: 1px solid var(--border-primary);
@@ -435,19 +447,36 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 /* Desktop media queries */
 @media (min-width: 1024px) {
+    body { overflow: hidden; }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; 
+        padding-top: 0; 
+        padding-bottom: 0;
+    }
+
     .layout-grid {
         grid-template-columns: 2fr 1fr; 
-        
         grid-template-areas: 
             "dashboard favourites"
             "forecast  favourites";
     }
 
-    .mobile-only {
-        display: none;
+    .mobile-only { display: none; }
+    .desktop-only { display: flex; }
+
+    .weather-dashboard { align-self: start; }
+
+    .dashboard-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start; 
+        margin-top: 0;
     }
 
-    .desktop-only {
-        display: flex;
-    }
+    .dashboard-left { flex: 1; }
+    .details-grid { width: 55%; margin-top: 0; }
+    .current-weather { margin-top: 0; }
 }
