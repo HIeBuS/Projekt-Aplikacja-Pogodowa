@@ -703,8 +703,6 @@ input:checked + .slider:before { transform: translateX(16px); }
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 420px;
-    overflow-y: scroll;
     padding-right: 10px;
 }
 
@@ -838,6 +836,11 @@ input:checked + .slider:before { transform: translateX(16px); }
     .dashboard-left { flex: 1; }
     .details-grid { width: 40%; margin-top: 0; }
     .current-weather { margin-top: 0; flex-wrap: nowrap; }
+
+    .fav-list {
+        max-height: 420px;
+        overflow-y: auto;
+    }
 
     .carousel-track { gap: 30px; }
     .day-card { min-width: 140px; }
