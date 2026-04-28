@@ -1,5 +1,38 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    const currentWeather = {
+        city: "Warsaw, Poland",
+        temp: 29,
+        condition: "Partly Sunny With Heavy Rain",
+        iconClass: "fa-cloud-sun", 
+        details: {
+            uv: "High",
+            humidity: "55%",
+            wind: "4 km/h",
+            visibility: "9.66 km",
+            aqi: 70 
+        }
+    };
+
+    // Tablica obiektow dla prognozy tygodniowej
+    const weeklyForecast = [
+        { dayName: "Mon", temp: 10, icon: "img/favicon.ico" },
+        { dayName: "Tue", temp: 12, icon: "img/favicon.ico" },
+        { dayName: "Wed", temp: 15, icon: "img/favicon.ico" },
+        { dayName: "Thu", temp: 13, icon: "img/favicon.ico" },
+        { dayName: "Fri", temp: 13, icon: "img/favicon.ico" },
+        { dayName: "Sat", temp: 16, icon: "img/favicon.ico" },
+        { dayName: "Sun", temp: 19, icon: "img/favicon.ico" }
+    ];
+
+    // Tablica obiektow dla ulubionych lokalizacji
+    const favouriteLocations = [
+        { city: "Kraków", temp: 18, icon: "img/favicon.ico", condition: "Rain" },
+        { city: "Gdańsk", temp: 15, icon: "img/favicon.ico", condition: "Cloudy" },
+        { city: "Wrocław", temp: 21, icon: "img/favicon.ico", condition: "Sun" },
+        { city: "Białystok", temp: 16, icon: "img/favicon.ico", condition: "Rain" }
+    ];
+
     //Current date in header
     const dateElements = document.querySelectorAll('.date, .overlay-date');
     const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
