@@ -81,6 +81,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (avgElement) {
         avgElement.textContent = "Weekly Average Temp: " + srednia + "°C";
     }
+    
+    //GENEROWANIE ULUBIONYCH LOKALIZACJI
+    
+    const favList = document.querySelector('.fav-list');
+    const emptyMsg = document.getElementById('fav-empty');
+    
+    if (favList && emptyMsg) {
+        favList.innerHTML = ''; 
+        favList.appendChild(emptyMsg); 
+        emptyMsg.classList.add('hidden'); 
+
+        favouriteLocations.forEach((miejsce) => {
+            const favItem = document.createElement('div');
+            favItem.classList.add('fav-item');
+            
+            favItem.innerHTML = `
+                <img src="${miejsce.icon}" class="fav-icon">
+                <span class="fav-temp">${miejsce.temp}°</span>
+                <span class="fav-city">${miejsce.city}</span>
+                <button class="fav-remove"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            
+            favList.appendChild(favItem); 
+        });
+    }
 
     // Current date in header
     const dateElements = document.querySelectorAll('.date, .overlay-date');
