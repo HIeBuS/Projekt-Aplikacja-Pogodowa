@@ -32,19 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
     //WYPELNIANIE GLOWNEGO PANELU
 
     document.querySelector('.location').textContent = currentWeather.city;
-    document.querySelector('.temperature').innerHTML = currentWeather.temp + "&deg;";
+    document.querySelector('.temperature').textContent = currentWeather.temp + "°";
     document.querySelector('.condition').textContent = currentWeather.condition;
 
     const ikona = document.querySelector('.current-weather .weather-icon');
     if (ikona) ikona.className = "fa-solid " + currentWeather.iconClass + " weather-icon";
 
-    const detale = document.querySelectorAll('.detail-value');
-    if (detale.length >= 4) {
-        detale[0].textContent = currentWeather.details.uv;
-        detale[1].textContent = currentWeather.details.humidity;
-        detale[2].textContent = currentWeather.details.wind;
-        detale[3].textContent = currentWeather.details.visibility;
-    }
+    document.getElementById('uv-val').textContent = currentWeather.details.uv;
+    document.getElementById('humidity-val').textContent = currentWeather.details.humidity;
+    document.getElementById('wind-val').textContent = currentWeather.details.wind;
+    document.getElementById('visibility-val').textContent = currentWeather.details.visibility;
 
     const pasekAQI = document.querySelector('.progress-fill');
     if (pasekAQI) pasekAQI.style.width = currentWeather.details.aqi + "%";
@@ -53,18 +50,30 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const track = document.querySelector('.carousel-track');
     if (track) {
-        track.innerHTML = ''; 
+        track.textContent = ''; 
 
         weeklyForecast.forEach((dzien) => {
             const karta = document.createElement('div');
             karta.classList.add('day-card');
             
-            karta.innerHTML = `
-                <span class="day-name">${dzien.dayName}</span>
-                <img src="${dzien.icon}" class="day-icon">
-                <span class="day-temp">${dzien.temp}°</span>
-            `;
+            const nazwaDnia = document.createElement('span');
+            nazwaDnia.classList.add('day-name');
+            nazwaDnia.textContent = dzien.dayName;
             
+            const ikona = document.createElement('img');
+            ikona.src = dzien.icon;
+            ikona.classList.add('day-icon');
+            ikona.alt = dzien.dayName + " weather icon"; 
+            
+            const temperatura = document.createElement('span');
+            temperatura.classList.add('day-temp');
+            temperatura.textContent = dzien.temp + "°";
+            
+            karta.appendChild(nazwaDnia);
+            karta.appendChild(ikona);
+            karta.appendChild(temperatura);
+            
+            // Wrzucenie calosci do karuzeli
             track.appendChild(karta);
         });
     }
