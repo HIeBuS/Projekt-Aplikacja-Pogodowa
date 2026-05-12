@@ -1,28 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const currentWeather = {
-        city: "Warsaw, Poland",
-        temp: 29,
-        condition: "Partly Sunny With Heavy Rain",
-        iconClass: "fa-cloud-sun", 
-        details: {
-            uv: "High",
-            humidity: "55%",
-            wind: "4 km/h",
-            visibility: "9.66 km",
-            aqi: 70 
-        }
-    };
-
-    const weeklyForecast = [
-        { dayName: "Mon", temp: 10, icon: "img/favicon.ico" },
-        { dayName: "Tue", temp: 12, icon: "img/favicon.ico" },
-        { dayName: "Wed", temp: 15, icon: "img/favicon.ico" },
-        { dayName: "Thu", temp: 13, icon: "img/favicon.ico" },
-        { dayName: "Fri", temp: 13, icon: "img/favicon.ico" },
-        { dayName: "Sat", temp: 16, icon: "img/favicon.ico" },
-        { dayName: "Sun", temp: 19, icon: "img/favicon.ico" }
-    ];
-
     const favouriteLocations = [
         { city: "Kraków", temp: 18, icon: "img/favicon.ico" },
         { city: "Gdańsk", temp: 15, icon: "img/favicon.ico" },
@@ -31,66 +7,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //WYPELNIANIE GLOWNEGO PANELU
 
-    document.querySelector('.location').textContent = currentWeather.city;
-    document.querySelector('.temperature').textContent = currentWeather.temp + "°";
-    document.querySelector('.condition').textContent = currentWeather.condition;
-
-    const ikona = document.querySelector('.current-weather .weather-icon');
-    if (ikona) ikona.className = "fa-solid " + currentWeather.iconClass + " weather-icon";
-
-    document.getElementById('uv-val').textContent = currentWeather.details.uv;
-    document.getElementById('humidity-val').textContent = currentWeather.details.humidity;
-    document.getElementById('wind-val').textContent = currentWeather.details.wind;
-    document.getElementById('visibility-val').textContent = currentWeather.details.visibility;
-
-    const pasekAQI = document.querySelector('.progress-fill');
-    if (pasekAQI) pasekAQI.style.width = currentWeather.details.aqi + "%";
-
-    //GENEROWANIE PROGNOZY TYGODNIOWEJ
+    // API pogoda (WARSZAWA)
+    const weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.2297&longitude=21.0122&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,visibility&daily=weather_code,temperature_2m_max,uv_index_max&timezone=auto";
     
-    const track = document.querySelector('.carousel-track');
-    if (track) {
-        track.textContent = ''; 
+    // API do jakosci powietrza
+    const aqiUrl = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=52.2297&longitude=21.0122&current=european_aqi&timezone=auto";
+    
+    async function pobierzPelneDane() {
+        try {
+            const [weatherResponse, aqiResponse] = await Promise.all([
+                fetch(weatherUrl),
+                fetch(aqiUrl)
+            ]);
 
-        weeklyForecast.forEach((dzien) => {
-            const karta = document.createElement('div');
-            karta.classList.add('day-card');
+            const dane = await weatherResponse.json();
+            const daneAqi = await aqiResponse.json();
+
+            // -main
+            document.querySelector('.location').textContent = "Warsaw, Poland";
+            document.querySelector('.temperature').textContent = Math.round(dane.current.temperature_2m) + "°";
+            document.querySelector('.condition').textContent = interpretujKodPogody(dane.current.weather_code);
+
+            // details
+            document.getElementById('uv-val').textContent = dane.daily.uv_index_max[0];
+            document.getElementById('humidity-val').textContent = dane.current.relative_humidity_2m + "%";
+            document.getElementById('wind-val').textContent = dane.current.wind_speed_10m + " km/h";
             
-            const nazwaDnia = document.createElement('span');
-            nazwaDnia.classList.add('day-name');
-            nazwaDnia.textContent = dzien.dayName;
+            const widocznoscKm = (dane.current.visibility / 1000).toFixed(1);
+            document.getElementById('visibility-val').textContent = widocznoscKm + " km";
+
+            const aqiValue = daneAqi.current.european_aqi;
+            const pasekAQI = document.querySelector('.progress-fill');
+            if (pasekAQI) {
+                const percentage = Math.min(aqiValue, 100);
+                pasekAQI.style.width = percentage + "%";
+            }
+
+            //GENEROWANIE PROGNOZY TYGODNIOWEJ
             
-            const ikona = document.createElement('img');
-            ikona.src = dzien.icon;
-            ikona.classList.add('day-icon');
-            ikona.alt = dzien.dayName + " weather icon"; 
-            
-            const temperatura = document.createElement('span');
-            temperatura.classList.add('day-temp');
-            temperatura.textContent = dzien.temp + "°";
-            
-            karta.appendChild(nazwaDnia);
-            karta.appendChild(ikona);
-            karta.appendChild(temperatura);
-            
-            // Wrzucenie calosci do karuzeli
-            track.appendChild(karta);
-        });
+            const track = document.querySelector('.carousel-track');
+            if (track){
+                track.textContent = '';
+
+                dane.daily.time.forEach((dataISO, i) => {
+                    const karta = document.createElement('div');
+                    karta.classList.add('day-card');
+
+                    const data = new Date(dataISO);
+                    const nazwaDnia = data.toLocaleDateString('en-GB', { weekday: 'short' });
+
+                    karta.innerHTML = `
+                        <span class="day-name">${nazwaDnia}</span>
+                        <img src="img/favicon.ico" class="day-icon" alt="weather">
+                        <span class="day-temp">${Math.round(dane.daily.temperature_2m_max[i])}°</span>
+                    `;
+                    track.appendChild(karta);
+                });
+            }
+            // Średnia temperatura z prognozy
+            const temperatury = dane.daily.temperature_2m_max;
+            const suma = temperatury.reduce((a, b) => a + b, 0);
+            const srednia = Math.round(suma / temperatury.length);
+            document.querySelector('.avg-temp').textContent = "Weekly Average Temp: " + srednia + "°C";
+
+        } catch (error) {
+            console.error("Błąd:", error);
+        }
     }
 
-    //LICZENIE SREDNIEJ TEMPERATURY
-    
-    let sumaTemperatur = 0;
-    weeklyForecast.forEach((dzien) => {
-        sumaTemperatur = sumaTemperatur + dzien.temp;
-    });
-    
-    let srednia = Math.round(sumaTemperatur / weeklyForecast.length);
-    const avgElement = document.querySelector('.avg-temp');
-    if (avgElement) {
-        avgElement.textContent = "Weekly Average Temp: " + srednia + "°C";
+    // API na tekst
+    function interpretujKodPogody(kod) {
+        if (kod === 0) return "Clear sky";
+        if (kod < 3) return "Partly cloudy";
+        if (kod < 50) return "Foggy";
+        return "Opady deszczu";
     }
-    
+
+    pobierzPelneDane();
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
     
     const favList = document.querySelector('.fav-list');
