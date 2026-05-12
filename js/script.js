@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //WYPELNIANIE GLOWNEGO PANELU
 
-    // API pogoda (WARSZAWA)
-    const weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.2297&longitude=21.0122&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,visibility&daily=weather_code,temperature_2m_max,uv_index_max&timezone=auto";
-    
-    // API do jakosci powietrza
-    const aqiUrl = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=52.2297&longitude=21.0122&current=european_aqi&timezone=auto";
-    
-    async function pobierzPelneDane() {
+    async function pobierzPelneDane(lat, lon, nazwaMiasta) {
+        // API pogoda (WARSZAWA)
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,visibility&daily=weather_code,temperature_2m_max,uv_index_max&timezone=auto`;
+        
+        // API do jakosci powietrza
+        const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi&timezone=auto`;
+
         try {
             const [weatherResponse, aqiResponse] = await Promise.all([
                 fetch(weatherUrl),
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const daneAqi = await aqiResponse.json();
 
             // -main
-            document.querySelector('.location').textContent = "Warsaw, Poland";
+            document.querySelector('.location').textContent = nazwaMiasta;
             document.querySelector('.temperature').textContent = Math.round(dane.current.temperature_2m) + "°";
             document.querySelector('.condition').textContent = interpretujKodPogody(dane.current.weather_code);
 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             //GENEROWANIE PROGNOZY TYGODNIOWEJ
-            
+
             const track = document.querySelector('.carousel-track');
             if (track){
                 track.textContent = '';
@@ -83,7 +83,53 @@ document.addEventListener('DOMContentLoaded', () => {
         return "Opady deszczu";
     }
 
-    pobierzPelneDane();
+    function zlokalizujMnie() {
+        // pokazujemy ze sie laduje
+        document.querySelector('.location').textContent = "Lokalizowanie...";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (pozycja) => {
+                    const lat = pozycja.coords.latitude;
+                    const lon = pozycja.coords.longitude;
+                    let nazwaMiasta = "Moja lokalizacja";
+
+                    try {
+                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                        const geoData = await geoRes.json();
+                        
+                        // nominatim zapisuje roznie zaleznie od wielkosci miejscowosci
+                        nazwaMiasta = geoData.address.city || geoData.address.town || geoData.address.village || "Moja lokalizacja";
+                    } catch (error) {
+                        console.log("Nie udało się pobrać nazwy miasta, zostawiamy domyślną.");
+                    }
+
+                    pobierzPelneDane(lat, lon, nazwaMiasta);
+                },
+                (error) => {
+                    console.error("Błąd geolokalizacji:", error);
+                    alert("Nie udało się pobrać Twojej lokalizacji. Wyświetlam domyślną (Warszawa).");
+                    pobierzPelneDane(52.2297, 21.0122, "Warszawa, Polska");
+                }
+            );
+        } else {
+            alert("Twoja przeglądarka nie wspiera geolokalizacji.");
+            pobierzPelneDane(52.2297, 21.0122, "Warszawa, Polska");
+        }
+    }
+
+    zlokalizujMnie();
+
+    const przyciskiLokalizacji = document.querySelectorAll('.btn');
+
+    przyciskiLokalizacji.forEach(przycisk => {
+        if (przycisk.textContent.includes('My Location')) {
+            przycisk.addEventListener('click', () => {
+                zlokalizujMnie();
+            });
+        }
+    });
+
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
     
     const favList = document.querySelector('.fav-list');
