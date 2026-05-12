@@ -7,7 +7,7 @@ Dawid Aleksiejuk, Jakub Hlebowicz
 Koncepcja projektu:
 
 1. Jakie dane będzie wykorzystywać aplikacja?
-Darmowe, niewymagające klucza API (Open-Meteo API zintegrowane z Geocoding API), dane pobierane w formacie JSON.
+Darmowe, niewymagające klucza API (Open-Meteo API zintegrowane z Nominatim API), dane pobierane w formacie JSON.
 Pobierane parametry: Aktualna temperatura, kody pogodowe (do dynamicznej podmiany ikon SVG), prędkość wiatru, wilgotność, jakość powietrza (AQI), indeks UV, widoczność, prognoza na kolejne 7 dni.
 
 2. Jakie będą jej podstawowe funkcje?
