@@ -1,28 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const currentWeather = {
-        city: "Warsaw, Poland",
-        temp: 29,
-        condition: "Partly Sunny With Heavy Rain",
-        iconClass: "fa-cloud-sun", 
-        details: {
-            uv: "High",
-            humidity: "55%",
-            wind: "4 km/h",
-            visibility: "9.66 km",
-            aqi: 70 
-        }
-    };
-
-    const weeklyForecast = [
-        { dayName: "Mon", temp: 10, icon: "img/favicon.ico" },
-        { dayName: "Tue", temp: 12, icon: "img/favicon.ico" },
-        { dayName: "Wed", temp: 15, icon: "img/favicon.ico" },
-        { dayName: "Thu", temp: 13, icon: "img/favicon.ico" },
-        { dayName: "Fri", temp: 13, icon: "img/favicon.ico" },
-        { dayName: "Sat", temp: 16, icon: "img/favicon.ico" },
-        { dayName: "Sun", temp: 19, icon: "img/favicon.ico" }
-    ];
-
     const favouriteLocations = [
         { city: "Kraków", temp: 18, icon: "img/favicon.ico" },
         { city: "Gdańsk", temp: 15, icon: "img/favicon.ico" },
@@ -31,57 +7,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //WYPELNIANIE GLOWNEGO PANELU
 
-    document.querySelector('.location').textContent = currentWeather.city;
-    document.querySelector('.temperature').innerHTML = currentWeather.temp + "&deg;";
-    document.querySelector('.condition').textContent = currentWeather.condition;
+    async function pobierzPelneDane(lat, lon, nazwaMiasta) {
+        // API pogoda (WARSZAWA)
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,visibility&daily=weather_code,temperature_2m_max,uv_index_max&timezone=auto`;
+        
+        // API do jakosci powietrza
+        const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi&timezone=auto`;
 
-    const ikona = document.querySelector('.current-weather .weather-icon');
-    if (ikona) ikona.className = "fa-solid " + currentWeather.iconClass + " weather-icon";
+        try {
+            const [weatherResponse, aqiResponse] = await Promise.all([
+                fetch(weatherUrl),
+                fetch(aqiUrl)
+            ]);
 
-    const detale = document.querySelectorAll('.detail-value');
-    if (detale.length >= 4) {
-        detale[0].textContent = currentWeather.details.uv;
-        detale[1].textContent = currentWeather.details.humidity;
-        detale[2].textContent = currentWeather.details.wind;
-        detale[3].textContent = currentWeather.details.visibility;
+            const dane = await weatherResponse.json();
+            const daneAqi = await aqiResponse.json();
+
+            // -main
+            document.querySelector('.location').textContent = nazwaMiasta;
+            document.querySelector('.temperature').textContent = Math.round(dane.current.temperature_2m) + "°";
+            document.querySelector('.condition').textContent = interpretujKodPogody(dane.current.weather_code);
+
+            // details
+            document.getElementById('uv-val').textContent = dane.daily.uv_index_max[0];
+            document.getElementById('humidity-val').textContent = dane.current.relative_humidity_2m + "%";
+            document.getElementById('wind-val').textContent = dane.current.wind_speed_10m + " km/h";
+            
+            const widocznoscKm = (dane.current.visibility / 1000).toFixed(1);
+            document.getElementById('visibility-val').textContent = widocznoscKm + " km";
+
+            const aqiValue = daneAqi.current.european_aqi;
+            const pasekAQI = document.querySelector('.progress-fill');
+            if (pasekAQI) {
+                const percentage = Math.min(aqiValue, 100);
+                pasekAQI.style.width = percentage + "%";
+            }
+
+            //GENEROWANIE PROGNOZY TYGODNIOWEJ
+
+            const track = document.querySelector('.carousel-track');
+            if (track){
+                track.textContent = '';
+
+                dane.daily.time.forEach((dataISO, i) => {
+                    const karta = document.createElement('div');
+                    karta.classList.add('day-card');
+
+                    const data = new Date(dataISO);
+                    const nazwaDnia = data.toLocaleDateString('en-GB', { weekday: 'short' });
+
+                    karta.innerHTML = `
+                        <span class="day-name">${nazwaDnia}</span>
+                        <img src="img/favicon.ico" class="day-icon" alt="weather">
+                        <span class="day-temp">${Math.round(dane.daily.temperature_2m_max[i])}°</span>
+                    `;
+                    track.appendChild(karta);
+                });
+            }
+            // Średnia temperatura z prognozy
+            const temperatury = dane.daily.temperature_2m_max;
+            const suma = temperatury.reduce((a, b) => a + b, 0);
+            const srednia = Math.round(suma / temperatury.length);
+            document.querySelector('.avg-temp').textContent = "Weekly Average Temp: " + srednia + "°C";
+
+        } catch (error) {
+            console.error("Błąd:", error);
+        }
     }
 
-    const pasekAQI = document.querySelector('.progress-fill');
-    if (pasekAQI) pasekAQI.style.width = currentWeather.details.aqi + "%";
-
-    //GENEROWANIE PROGNOZY TYGODNIOWEJ
-    
-    const track = document.querySelector('.carousel-track');
-    if (track) {
-        track.innerHTML = ''; 
-
-        weeklyForecast.forEach((dzien) => {
-            const karta = document.createElement('div');
-            karta.classList.add('day-card');
-            
-            karta.innerHTML = `
-                <span class="day-name">${dzien.dayName}</span>
-                <img src="${dzien.icon}" class="day-icon">
-                <span class="day-temp">${dzien.temp}°</span>
-            `;
-            
-            track.appendChild(karta);
-        });
+    // API na tekst
+    function interpretujKodPogody(kod) {
+        if (kod === 0) return "Clear sky";
+        if (kod < 3) return "Partly cloudy";
+        if (kod < 50) return "Foggy";
+        return "Opady deszczu";
     }
 
-    //LICZENIE SREDNIEJ TEMPERATURY
-    
-    let sumaTemperatur = 0;
-    weeklyForecast.forEach((dzien) => {
-        sumaTemperatur = sumaTemperatur + dzien.temp;
+    function zlokalizujMnie() {
+        // pokazujemy ze sie laduje
+        document.querySelector('.location').textContent = "Lokalizowanie...";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (pozycja) => {
+                    const lat = pozycja.coords.latitude;
+                    const lon = pozycja.coords.longitude;
+                    let nazwaMiasta = "Moja lokalizacja";
+
+                    try {
+                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                        const geoData = await geoRes.json();
+                        
+                        // nominatim zapisuje roznie zaleznie od wielkosci miejscowosci
+                        nazwaMiasta = geoData.address.city || geoData.address.town || geoData.address.village || "Moja lokalizacja";
+                    } catch (error) {
+                        console.log("Nie udało się pobrać nazwy miasta, zostawiamy domyślną.");
+                    }
+
+                    pobierzPelneDane(lat, lon, nazwaMiasta);
+                },
+                (error) => {
+                    console.error("Błąd geolokalizacji:", error);
+                    alert("Nie udało się pobrać Twojej lokalizacji. Wyświetlam domyślną (Warszawa).");
+                    pobierzPelneDane(52.2297, 21.0122, "Warszawa, Polska");
+                }
+            );
+        } else {
+            alert("Twoja przeglądarka nie wspiera geolokalizacji.");
+            pobierzPelneDane(52.2297, 21.0122, "Warszawa, Polska");
+        }
+    }
+
+    zlokalizujMnie();
+
+    const przyciskiLokalizacji = document.querySelectorAll('.btn');
+
+    przyciskiLokalizacji.forEach(przycisk => {
+        if (przycisk.textContent.includes('My Location')) {
+            przycisk.addEventListener('click', () => {
+                zlokalizujMnie();
+            });
+        }
     });
-    
-    let srednia = Math.round(sumaTemperatur / weeklyForecast.length);
-    const avgElement = document.querySelector('.avg-temp');
-    if (avgElement) {
-        avgElement.textContent = "Weekly Average Temp: " + srednia + "°C";
-    }
-    
+
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
     
     const favList = document.querySelector('.fav-list');
