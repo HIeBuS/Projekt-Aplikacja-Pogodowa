@@ -28,6 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.temperature').textContent = Math.round(dane.current.temperature_2m) + "°";
             document.querySelector('.condition').textContent = interpretujKodPogody(dane.current.weather_code);
 
+            const kodDlaTla = dane.current.weather_code;
+            const nazwaPlikuTla = pobierzTloPogody(kodDlaTla);
+            document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('img/${nazwaPlikuTla}')`;
+            //gradient aby zrobic troche kontrastu tekstu i jasnych zdjec
+            
+            const głównyKodPogody = dane.current.weather_code;
+            const głównaIkonaKlasa = pobierzIkonePogody(głównyKodPogody);
+            const mainIcon = document.querySelector('.current-weather .weather-icon');
+            if (mainIcon) {
+                // zachowujemy klase weather-icon podmieniamy tylko ikone fa-*
+                mainIcon.className = `fa-solid ${głównaIkonaKlasa} weather-icon`;
+            }
             // details
             document.getElementById('uv-val').textContent = dane.daily.uv_index_max[0];
             document.getElementById('humidity-val').textContent = dane.current.relative_humidity_2m + "%";
@@ -56,9 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = new Date(dataISO);
                     const nazwaDnia = data.toLocaleDateString('en-GB', { weekday: 'short' });
 
+                    const ikonaKlasa = pobierzIkonePogody(dane.daily.weather_code[i]);
+
                     karta.innerHTML = `
                         <span class="day-name">${nazwaDnia}</span>
-                        <img src="img/favicon.ico" class="day-icon" alt="weather">
+                        <i class="fa-solid ${ikonaKlasa} day-icon" style="font-size: 2.2rem; margin: 10px 0;"></i>
                         <span class="day-temp">${Math.round(dane.daily.temperature_2m_max[i])}°</span>
                     `;
                     track.appendChild(karta);
@@ -81,6 +95,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (kod < 3) return "Partly cloudy";
         if (kod < 50) return "Foggy";
         return "Opady deszczu";
+    }
+
+    function pobierzIkonePogody(kod) {
+        if (kod === 0) return "fa-sun"; // Czyste niebo
+        if (kod === 1 || kod === 2) return "fa-cloud-sun"; // Częściowe zachmurzenie
+        if (kod === 3) return "fa-cloud"; // Całkowite zachmurzenie
+        if (kod >= 45 && kod <= 48) return "fa-smog"; // Mgła
+        if ((kod >= 51 && kod <= 67) || (kod >= 80 && kod <= 82)) return "fa-cloud-rain"; // Deszcz
+        if ((kod >= 71 && kod <= 77) || kod === 85 || kod === 86) return "fa-snowflake"; // Śnieg
+        if (kod >= 95 && kod <= 99) return "fa-cloud-bolt"; // Burza
+        
+        return "fa-cloud"; // Domyślna ikona
+    }
+
+    function pobierzTloPogody(kod) {
+        if (kod === 0 || kod === 1) return "bg-sun.jpg"; // Czyste niebo
+        if (kod === 2 || kod === 3 || (kod >= 45 && kod <= 48)) return "bg-clouds.jpg"; // Zachmurzenie
+        if ((kod >= 51 && kod <= 67) || (kod >= 80 && kod <= 82)) return "bg-rain.jpg"; // Deszcz
+        if ((kod >= 71 && kod <= 77) || kod === 85 || kod === 86) return "bg-snow.jpg"; // Śnieg
+        if (kod >= 95 && kod <= 99) return "bg-thunderstorm.jpg"; // Burza
+        
+        return "bg-clouds.jpg"; // Domyślne tło
     }
 
     function zlokalizujMnie() {
