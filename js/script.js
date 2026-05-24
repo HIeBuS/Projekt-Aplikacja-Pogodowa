@@ -166,6 +166,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    async function wyszukajMiasto(nazwaMiasta) {
+        try {
+            // pokazywanie ze szuka
+            document.querySelector('.location').textContent = "Szukam...";
+            // api do zamiany na kordy
+            const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${nazwaMiasta}&count=1&language=pl&format=json`;
+            const geoOdpowiedz = await fetch(geoUrl);
+            const geoDane = await geoOdpowiedz.json();
+
+            // sprawdzamy czy cokolwiek zostalo znalezione
+            if (geoDane.results && geoDane.results.length > 0) {
+                const znalezioneMiasto = geoDane.results[0];
+                const lat = znalezioneMiasto.latitude;
+                const lon = znalezioneMiasto.longitude;
+                // pobieramy pelna nazwe
+                const pelnaNazwa = znalezioneMiasto.name; 
+
+                pobierzPelneDane(lat, lon, pelnaNazwa);
+            } else {
+                alert("Nie znaleziono takiego miasta!");
+                document.querySelector('.location').textContent = "Nie znaleziono";
+            }
+        } catch (error) {
+            console.error("Błąd wyszukiwania:", error);
+            alert("Wystąpił błąd serwera podczas wyszukiwania.");
+            document.querySelector('.location').textContent = "Błąd";
+        }
+    }
+    
+    const polaWyszukiwania = document.querySelectorAll('.search-bar input');
+
+    polaWyszukiwania.forEach(pole => {
+        pole.addEventListener('keypress', (event) => {
+            // sprawdzamy czy wcisniety klawisz to enter
+            if (event.key === 'Enter') {
+                const wpisaneMiasto = pole.value.trim();
+                
+                if (wpisaneMiasto !== "") {
+                    wyszukajMiasto(wpisaneMiasto);
+                    pole.value = ''; // czyscimy pole wpisywania po wcisnieciu entera
+                }
+            }
+        });
+    });
+    
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
     
     const favList = document.querySelector('.fav-list');
