@@ -23,6 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const dane = await weatherResponse.json();
             const daneAqi = await aqiResponse.json();
 
+            obecnaJednostka = 'C';
+            const wszystkiePrzyciskiJednostek = document.querySelectorAll('.unit-btn');
+            
+            wszystkiePrzyciskiJednostek.forEach(przycisk => {
+                if (przycisk.textContent.includes('C')) {
+                    przycisk.classList.add('is-active');
+                    przycisk.setAttribute('aria-pressed', 'true');
+                } else {
+                    przycisk.classList.remove('is-active');
+                    przycisk.setAttribute('aria-pressed', 'false');
+                }
+            });
+
             // -main
             document.querySelector('.location').textContent = nazwaMiasta;
             document.querySelector('.temperature').textContent = Math.round(dane.current.temperature_2m) + "°";
@@ -267,6 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     //Toggle units (°C / °F)
+    let obecnaJednostka = 'C';
+
     const unitToggles = document.querySelectorAll('.unit-toggle');
 
     unitToggles.forEach(toggleGroup => {
@@ -274,19 +289,72 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                btns.forEach(b => {
-                    b.classList.remove('is-active');
-                    b.setAttribute('aria-pressed', 'false');
-                });
-                
-                e.target.classList.add('is-active');
-                e.target.setAttribute('aria-pressed', 'true');
+                // wyciagamy sama literke 'C' lub 'F' z kliknietego przycisku
+                const wybranaJednostka = e.target.textContent.replace('°', ''); 
 
-                //Sprawdzanie wybranej jednostki i przeliczenie danych z API
+                // klikniecie tego samego nic nie zmienia
+                if (obecnaJednostka === wybranaJednostka) return;
+
+                const wszystkiePrzyciskiJednostek = document.querySelectorAll('.unit-btn');
+                wszystkiePrzyciskiJednostek.forEach(b => {
+                    if (b.textContent.includes(wybranaJednostka)) {
+                        b.classList.add('is-active');
+                        b.setAttribute('aria-pressed', 'true');
+                    } else {
+                        b.classList.remove('is-active');
+                        b.setAttribute('aria-pressed', 'false');
+                    }
+                });
+
+                // przeliczanie wszystkich temperatur na stronie
+                przeliczWszystkieTemperatury(wybranaJednostka);
+
+                obecnaJednostka = wybranaJednostka;
             });
         });
     });
 
+    function przeliczWszystkieTemperatury(nowaJednostka) {
+        // glowna temperatura
+        const tempMain = document.querySelector('.temperature');
+        if (tempMain && tempMain.textContent) {
+            tempMain.textContent = konwertujZnak(tempMain.textContent, nowaJednostka) + "°";
+        }
+
+        // temperatury dni w prognozie
+        const tempDni = document.querySelectorAll('.day-temp');
+        tempDni.forEach(el => {
+            el.textContent = konwertujZnak(el.textContent, nowaJednostka) + "°";
+        });
+
+        // temperatury w ulubionych
+        const tempUlubione = document.querySelectorAll('.fav-temp');
+        tempUlubione.forEach(el => {
+            el.textContent = konwertujZnak(el.textContent, nowaJednostka) + "°";
+        });
+
+        // srednia temperatura
+        const avgTempEl = document.querySelector('.avg-temp');
+        if (avgTempEl && avgTempEl.textContent) {
+            // wyciagamy sama liczbe z tekstu
+            const staraLiczba = avgTempEl.textContent.match(/-?\d+/)[0]; 
+            const nowaLiczba = konwertujZnak(staraLiczba, nowaJednostka);
+            avgTempEl.textContent = `Weekly Average Temp: ${nowaLiczba}°${nowaJednostka}`;
+        }
+    }
+
+    function konwertujZnak(staraWartosc, nowaJednostka) {
+        // zamieniamy tekst liczbe calkowita
+        const liczba = parseInt(staraWartosc);
+        
+        if (nowaJednostka === 'F') {
+            // Celsjusze -> Fahrenheity
+            return Math.round((liczba * 1.8) + 32);
+        } else {
+            // Fahrenheity -> Celsjusze
+            return Math.round((liczba - 32) / 1.8);
+        }
+    }
 
     //Hamburger mobile menu
     const hamburgerBtn = document.querySelector('.hamburger');
