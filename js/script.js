@@ -23,6 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const dane = await weatherResponse.json();
             const daneAqi = await aqiResponse.json();
 
+            obecnaJednostka = 'C';
+            const wszystkiePrzyciskiJednostek = document.querySelectorAll('.unit-btn');
+            
+            wszystkiePrzyciskiJednostek.forEach(przycisk => {
+                if (przycisk.textContent.includes('C')) {
+                    przycisk.classList.add('is-active');
+                    przycisk.setAttribute('aria-pressed', 'true');
+                } else {
+                    przycisk.classList.remove('is-active');
+                    przycisk.setAttribute('aria-pressed', 'false');
+                }
+            });
+
             // -main
             document.querySelector('.location').textContent = nazwaMiasta;
             document.querySelector('.temperature').textContent = Math.round(dane.current.temperature_2m) + "°";
