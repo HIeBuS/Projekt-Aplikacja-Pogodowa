@@ -109,6 +109,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return "fa-cloud"; // Domyślna ikona
     }
 
+    async function pobierzNazweZKoordynatow(lat, lon) {
+        try {
+            const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+            const geoRes = await fetch(geoUrl);
+            const geoData = await geoRes.json();
+            
+            if (geoData && geoData.address) {
+                return geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.country || "Unknown";
+            }
+            return "Somewhere on the ocean";
+        } catch (error) {
+            console.error("Błąd pobierania nazwy:", error);
+            return "Unknown location";
+        }
+    }
+
     function pobierzTloPogody(kod) {
         if (kod === 0 || kod === 1) return "bg-sun.jpg"; // Czyste niebo
         if (kod === 2 || kod === 3 || (kod >= 45 && kod <= 48)) return "bg-clouds.jpg"; // Zachmurzenie
@@ -128,17 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 async (pozycja) => {
                     const lat = pozycja.coords.latitude;
                     const lon = pozycja.coords.longitude;
-                    let nazwaMiasta = "Moja lokalizacja";
-
-                    try {
-                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                        const geoData = await geoRes.json();
-                        
-                        // nominatim zapisuje roznie zaleznie od wielkosci miejscowosci
-                        nazwaMiasta = geoData.address.city || geoData.address.town || geoData.address.village || "Moja lokalizacja";
-                    } catch (error) {
-                        console.log("Nie udało się pobrać nazwy miasta, zostawiamy domyślną.");
-                    }
+                    const nazwaMiasta = await pobierzNazweZKoordynatow(lat, lon);
 
                     pobierzPelneDane(lat, lon, nazwaMiasta);
                 },
@@ -162,6 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (przycisk.textContent.includes('My Location')) {
             przycisk.addEventListener('click', () => {
                 zlokalizujMnie();
+            });
+        }
+        else if (przycisk.textContent.includes('RANDOM')) {
+            przycisk.addEventListener('click', () => {
+                losowaLokalizacja();
             });
         }
     });
@@ -211,6 +222,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    async function losowaLokalizacja() {
+        const randomLat = (Math.random() * 180 - 90).toFixed(4);
+        const randomLon = (Math.random() * 360 - 180).toFixed(4);
+
+        document.querySelector('.location').textContent = "Losowanie świata...";
+
+        const nazwaMiejsca = await pobierzNazweZKoordynatow(randomLat, randomLon);
+        
+        pobierzPelneDane(randomLat, randomLon, nazwaMiejsca);
+    }
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
     
     const favList = document.querySelector('.fav-list');
