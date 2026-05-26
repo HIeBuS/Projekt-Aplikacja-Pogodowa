@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const favouriteLocations = [
-        { city: "Kraków", temp: 18, icon: "img/favicon.ico" },
-        { city: "Gdańsk", temp: 15, icon: "img/favicon.ico" },
-        { city: "Wrocław", temp: 21, icon: "img/favicon.ico" }
-    ];
+    let favouriteLocations = JSON.parse(localStorage.getItem('weatherFavs')) || [];
 
     //WYPELNIANIE GLOWNEGO PANELU
 
@@ -96,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const suma = temperatury.reduce((a, b) => a + b, 0);
             const srednia = Math.round(suma / temperatury.length);
             document.querySelector('.avg-temp').textContent = "Weekly Average Temp: " + srednia + "°C";
+
+            const aktualnaTemperatura = Math.round(dane.current.temperature_2m);
+            dodajDoUlubionych(nazwaMiasta, aktualnaTemperatura);
 
         } catch (error) {
             console.error("Błąd:", error);
@@ -248,19 +247,31 @@ document.addEventListener('DOMContentLoaded', () => {
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
     
     const favList = document.querySelector('.fav-list');
-    const emptyMsg = document.getElementById('fav-empty');
-    
-    if (favList && emptyMsg) {
+
+    function renderujUlubione() {
+        const emptyMsg = document.getElementById('fav-empty');
+        
+        if (!favList || !emptyMsg) return;
+
+        // czyszczenie starej listy i zachowanie komunikatu o braku miast
         favList.innerHTML = ''; 
         favList.appendChild(emptyMsg); 
         emptyMsg.classList.add('hidden'); 
+
+        if (favouriteLocations.length === 0) {
+            emptyMsg.classList.remove('hidden');
+            return;
+        }
 
         favouriteLocations.forEach((miejsce) => {
             const favItem = document.createElement('div');
             favItem.classList.add('fav-item');
             
+            // dodajemy unikalny atrybut danych zeby wiedziec ktore miasto usuwamy
+            favItem.dataset.city = miejsce.city;
+            
             favItem.innerHTML = `
-                <img src="${miejsce.icon}" class="fav-icon">
+                <i class="fa-solid fa-cloud fav-icon" style="font-size: 1.5rem; margin-right: 10px;"></i>
                 <span class="fav-temp">${miejsce.temp}°</span>
                 <span class="fav-city">${miejsce.city}</span>
                 <button class="fav-remove"><i class="fa-solid fa-xmark"></i></button>
@@ -268,6 +279,36 @@ document.addEventListener('DOMContentLoaded', () => {
             
             favList.appendChild(favItem); 
         });
+    }
+
+    // wywolujemy funkcje od razu na starcie aplikacji zeby pokazac zapisane miasta
+    renderujUlubione();
+
+    function dodajDoUlubionych(nazwa, temperatura) {
+        // ignorujemy puste nazwy lub domyslne komunikaty systemowe
+        if (nazwa === "Moja lokalizacja" || nazwa === "Losowanie świata..." || nazwa === "Szukam...") return;
+
+        // sprawdzamy czy to miasto juz przypadkiem nie jest na liscie
+        const indeks = favouriteLocations.findIndex(m => m.city.toLowerCase() === nazwa.toLowerCase());
+        
+        if (indeks !== -1) {
+            // jesli miasto juz istnieje usuwamy je ze starej pozycji zeby wskoczylo na sama gore
+            favouriteLocations.splice(indeks, 1);
+        }
+
+        // sodajemy nowe wyszukanie na sam poczatek tablicy
+        favouriteLocations.unshift({ city: nazwa, temp: temperatura });
+
+        // ograniczamy liste do 5 ostatnich pozycji
+        if (favouriteLocations.length > 5) {
+            favouriteLocations.pop();
+        }
+
+        // glowny zapis do bazy danych przegladarki
+        localStorage.setItem('weatherFavs', JSON.stringify(favouriteLocations));
+
+        // odswiezamy dane ulubionch
+        renderujUlubione();
     }
 
     // Current date in header
@@ -394,16 +435,24 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (removeBtn) {
                 const favItem = removeBtn.closest('.fav-item');
+                const miastoDoUsuniecia = favItem.dataset.city;
                 
                 favItem.style.opacity = '0';
                 favItem.style.transform = 'translateX(20px)';
                 
                 setTimeout(() => {
-                    favItem.remove();
-                    //Usuwanie miasta z tablicy w localStorage
-                    if (favList.querySelectorAll('.fav-item').length === 0) {
-                        document.getElementById('fav-empty').classList.remove('hidden');
+                    const index = favouriteLocations.findIndex(m => m.city === miastoDoUsuniecia);
+                    
+                    // Jeśli miasto znajduje się w tablicy, wycinamy je za pomocą splice
+                    if (index !== -1) {
+                        favouriteLocations.splice(index, 1);
                     }
+                    
+                    // Zapisujemy zaktualizowaną tablicę do pamięci przeglądarki
+                    localStorage.setItem('weatherFavs', JSON.stringify(favouriteLocations));
+                    
+                    // Przerysowujemy listę na ekranie od nowa
+                    renderujUlubione();
                 }, 200); 
             }
         });
@@ -451,8 +500,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Logika ukrywania deszczowych dni z checkboxa #hideRainToggle: dodawaj lub usuwaj klasę 'hidden' na zmianę dla #forecast-empty oraz #carousel-wrapper    
-    //Zmiana tła w zależności od kodu pogody
-    //Obsługa wyszukiwarki (fetch do API i renderowanie DOM)
-    //Przyciski My Location i Random
+     // Logika ukrywania deszczowych dni z checkboxa #hideRainToggle: dodawaj lub usuwaj klasę 'hidden' na zmianę dla #forecast-empty oraz #carousel-wrapper
 });
