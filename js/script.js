@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     let favouriteLocations = JSON.parse(localStorage.getItem('weatherFavs')) || [];
+    let obecnaJednostka = 'C';
+    let isRainHidden = false; 
+
+    const track = document.querySelector('.carousel-track');
+    const favList = document.querySelector('.fav-list');
+    const emptyMsg = document.getElementById('fav-empty');
+    const rainToggle = document.getElementById('hideRainToggle');
+    const forecastEmpty = document.getElementById('forecast-empty');
 
     //WYPELNIANIE GLOWNEGO PANELU
 
@@ -19,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const dane = await weatherResponse.json();
             const daneAqi = await aqiResponse.json();
 
-            obecnaJednostka = 'C';
             const wszystkiePrzyciskiJednostek = document.querySelectorAll('.unit-btn');
             
             wszystkiePrzyciskiJednostek.forEach(przycisk => {
@@ -95,6 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const aktualnaTemperatura = Math.round(dane.current.temperature_2m);
             dodajDoUlubionych(nazwaMiasta, aktualnaTemperatura);
+
+            applyRainFilter();
+
+            if (rainToggle) {
+                rainToggle.dispatchEvent(new Event('change'));
+            }
 
         } catch (error) {
             console.error("Błąd:", error);
@@ -245,11 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pobierzPelneDane(randomLat, randomLon, nazwaMiejsca);
     }
     //GENEROWANIE ULUBIONYCH LOKALIZACJI
-    
-    const favList = document.querySelector('.fav-list');
 
     function renderujUlubione() {
-        const emptyMsg = document.getElementById('fav-empty');
         
         if (!favList || !emptyMsg) return;
 
@@ -321,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     //Toggle units (°C / °F)
-    let obecnaJednostka = 'C';
 
     const unitToggles = document.querySelectorAll('.unit-toggle');
 
@@ -500,5 +509,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-     // Logika ukrywania deszczowych dni z checkboxa #hideRainToggle: dodawaj lub usuwaj klasę 'hidden' na zmianę dla #forecast-empty oraz #carousel-wrapper
+    function applyRainFilter() {
+        const kafelkiDni = document.querySelectorAll('.day-card');
+        let ukryteDni = 0;
+
+        kafelkiDni.forEach(kafelek => {
+            const ikona = kafelek.querySelector('i');
+            if (ikona) {
+                const czyDeszcz = ikona.classList.contains('fa-cloud-rain') || ikona.classList.contains('fa-cloud-bolt');
+                if (czyDeszcz) kafelek.classList.toggle('hidden', isRainHidden);
+            }
+            if (kafelek.classList.contains('hidden')) ukryteDni++;
+        });
+
+        if (forecastEmpty) {
+            forecastEmpty.classList.toggle('hidden', !(ukryteDni === kafelkiDni.length && kafelkiDni.length > 0));
+        }
+    }
+
+    // listener checkboxa teraz tylko wywoluje funkcje
+    rainToggle?.addEventListener('change', () => {
+        isRainHidden = rainToggle.checked;
+        applyRainFilter();
+    });
 });
