@@ -1,0 +1,61 @@
+/* Desktop media queries */
+@media (min-width: 1024px) {
+    html, body { overflow: hidden; }
+
+    .header { position: relative; } 
+
+    .desktop-only { display: flex !important; }
+    .mobile-only { display: none !important; }
+    .mobile-menu-overlay { display: none !important; } 
+    .mobile-menu-overlay.is-active { display: none !important; }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 2vh;
+        padding-bottom: 1.8vh;
+        margin: 0 auto;
+    }
+
+    .layout-grid {
+        grid-template-columns: 2fr 1fr;
+        grid-template-areas:
+            "dashboard favourites"
+            "forecast  favourites";
+        gap: 12px;
+    }
+
+    .weather-dashboard { align-self: start; }
+
+    .dashboard-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 0;
+    }
+
+    .dashboard-left { flex: 1; }
+    .details-grid { width: 40%; margin-top: 0; }
+    .current-weather { margin-top: 0; flex-wrap: nowrap; }
+
+    .fav-list {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+
+    .carousel-track { gap: 30px; }
+    .day-card { min-width: 140px; }
+
+    .footer {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 20px 30px;
+    }
+
+    .footer-item {
+        width: auto;
+        padding: 0;
+        border: none;
+    }
+}
