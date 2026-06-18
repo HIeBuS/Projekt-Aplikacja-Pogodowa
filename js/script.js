@@ -155,12 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (kod === 2 || kod === 3 || (kod >= 45 && kod <= 48)) return "bg-clouds.jpg"; // Zachmurzenie
         if ((kod >= 51 && kod <= 67) || (kod >= 80 && kod <= 82)) return "bg-rain.jpg"; // Deszcz
         if ((kod >= 71 && kod <= 77) || kod === 85 || kod === 86) return "bg-snow.jpg"; // Śnieg
-        if (kod >= 95 && kod <= 99) return "bg-thunderstorm.jpg"; // Burza
+        if (kod >= 95 && kod <= 99) return "bg-lightning.jpg"; // Burza
         
         return "bg-clouds.jpg"; // Domyślne tło
     }
 
-    function zlokalizujMnie() {
+    function zlokalizujMnie() { 
         // pokazujemy ze sie laduje
         document.querySelector('.location').textContent = "Lokalizowanie...";
 
@@ -533,3 +533,21 @@ document.addEventListener('DOMContentLoaded', () => {
         applyRainFilter();
     });
 });
+
+//Anonymous report toggle
+const anonCheckbox = document.getElementById('anonymous-toggle');
+const userFieldsRow = document.querySelector('.id-user-fields');
+const nameInput = document.getElementById('user-name');
+const emailInput = document.getElementById('user-email');
+
+if (anonCheckbox && userFieldsRow) {
+    anonCheckbox.addEventListener('change', () => {
+        if (anonCheckbox.checked) {
+            userFieldsRow.classList.add('hidden');
+            if (nameInput) nameInput.value = '';
+            if (emailInput) emailInput.value = '';
+        } else {
+            userFieldsRow.classList.remove('hidden');
+        }
+    });
+}

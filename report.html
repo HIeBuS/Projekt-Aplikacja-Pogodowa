@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Weather App - Report an Issue</title>
+    <meta name="author" content="Dawid Aleksiejuk, Jakub Hlebowicz">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <!-- Navbar -->
+        <nav class="navbar glass-panel" aria-label="Main navigation">
+            <div class="navbar-logo logo">
+                <i class="fa-solid fa-cloud-sun" aria-hidden="true"></i> 
+                <a href="index.html" aria-label="WeatherApp Home"><span>WeatherApp</span></a>
+            </div>
+            <div class="navbar-actions desktop-only">
+                <a href="index.html" class="btn" style="text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+                </a>
+            </div>
+            <button class="hamburger mobile-only" aria-label="Open mobile menu" aria-expanded="false" aria-controls="mobileMenu">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Bug Report Form -->
+    <main class="container">
+        <div class="report-container">
+            <section class="report-card glass-panel">
+                <h2>Report an Issue</h2>
+                <form class="report-form" action="index.html" method="GET">
+                    <div class="form-group">
+                        <label for="issue-type">Issue Category</label>
+                        <select id="issue-type" class="form-control" required>
+                            <option value="" disabled selected>Choose a category...</option>
+                            <option value="weather">Incorrect Weather Data</option>
+                            <option value="ui">Interface / Layout Bug</option>
+                            <option value="search">City Search Failure</option>
+                            <option value="other">Other Issue</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-checkbox">
+                            <input type="checkbox" id="anonymous-toggle">
+                            <span>Report anonymously</span>
+                        </label>
+                    </div>
+                    <div class="form-row id-user-fields">
+                        <div class="form-group form-group-user">
+                            <label for="user-name">Your Name</label>
+                            <input type="text" id="user-name" class="form-control" placeholder="John Doe">
+                        </div>
+                        <div class="form-group form-group-user">
+                            <label for="user-email">Your Email</label>
+                            <input type="email" id="user-email" class="form-control" placeholder="john@example.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Urgency Level</label>
+                        <div class="form-checkbox-group">
+                            <label class="form-checkbox">
+                                <input type="radio" name="urgency" value="low" checked>
+                                <span>Low (Visual glitch or suggestion)</span>
+                            </label>
+                            <label class="form-checkbox">
+                                <input type="radio" name="urgency" value="high">
+                                <span>High (App crash or broken feature)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue-desc">Description of the problem</label>
+                        <textarea id="issue-desc" class="form-control" placeholder="Please describe what went wrong..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn">
+                        <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Submit Report
+                    </button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer glass-panel">
+        <span class="footer-item">Dawid Aleksiejuk, Jakub Hlebowicz</span>
+        <a href="https://github.com/HIeBuS/Projekt-Aplikacja-Pogodowa" target="_blank" rel="noopener noreferrer" class="footer-item footer-link" aria-label="GitHub repository">
+            <i class="fa-brands fa-github" aria-hidden="true"></i> github.com/HleBuS/weatherapp
+        </a>
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="footer-item footer-link" aria-label="Open-Meteo API website">
+            Data provided by Open-Meteo
+        </a>
+    </footer>
+
+    <!-- Mobile Fullscreen Menu Overlay -->
+    <div class="mobile-menu-overlay glass-panel" id="mobileMenu" aria-hidden="false">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <span class="overlay-date"></span>
+            </div>
+            <nav class="overlay-nav" aria-label="Mobile navigation">
+                <a href="index.html" class="overlay-link">Dashboard</a>
+                <a href="index.html#weekly-forecast" class="overlay-link">Weekly Forecast</a>
+                <a href="index.html#favourite-locations" class="overlay-link">Favourites</a>
+            </nav>
+            <a href="https://github.com/HIeBuS/Projekt-Aplikacja-Pogodowa" target="_blank" rel="noopener noreferrer" class="footer-item footer-link" aria-label="GitHub repository">
+                <i class="fa-brands fa-github" aria-hidden="true"></i> Aplikacja Pogodowa
+            </a>
+            <div class="overlay-footer logo">
+                <i class="fa-solid fa-cloud-sun" aria-hidden="true"></i>
+                <a href="index.html" aria-label="Home page"><span>WeatherApp</span></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
