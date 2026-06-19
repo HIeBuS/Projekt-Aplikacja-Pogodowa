@@ -201,10 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 //Anonymous report toggle
-const anonCheckbox = document.getElementById('anonymous-toggle');
+const anonCheckbox = document.querySelector('#anonymous-toggle');
 const userFieldsRow = document.querySelector('.id-user-fields');
-const nameInput = document.getElementById('user-name');
-const emailInput = document.getElementById('user-email');
+const nameInput = document.querySelector('#user-name');
+const emailInput = document.querySelector('#user-email');
 
 if (anonCheckbox && userFieldsRow) {
     anonCheckbox.addEventListener('change', () => {
